@@ -3,139 +3,96 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GitHub Gist 동기화 파일 저장소</title>
+  <title>Cloud Drive</title>
   <style>
     :root {
-      --primary-color: #2563eb;
-      --bg-color: #f8fafc;
-      --card-bg: #ffffff;
-      --text-color: #0f172a;
+      --glass-bg: rgba(255, 255, 255, 0.45);
+      --glass-border: rgba(255, 255, 255, 0.6);
+      --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.08);
+      --primary-color: #007aff;
+      --text-main: #1c1c1e;
+      --text-sub: #8e8e93;
     }
-
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-color);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+      background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+      min-height: 100vh;
       margin: 0;
-      padding: 20px;
+      padding: 24px 16px;
+      color: var(--text-main);
       display: flex;
       justify-content: center;
     }
-
-    .container {
-      width: 100%;
-      max-width: 600px;
-    }
-
-    .card {
-      background: var(--card-bg);
-      border-radius: 12px;
+    .container { width: 100%; max-width: 480px; display: flex; flex-direction: column; gap: 20px; }
+    .ios-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid var(--glass-border);
+      border-radius: 28px;
       padding: 24px;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-      margin-bottom: 20px;
+      box-shadow: var(--glass-shadow);
     }
-
-    h1, h2 {
-      margin-top: 0;
-      font-size: 1.25rem;
-    }
-
+    h1, h2 { margin: 0 0 16px 0; font-size: 1.15rem; font-weight: 700; }
     .upload-box {
-      border: 2px dashed #cbd5e1;
-      border-radius: 8px;
-      padding: 24px;
+      border: 2px dashed rgba(255, 255, 255, 0.8);
+      border-radius: 20px;
+      padding: 28px 16px;
       text-align: center;
-      background: #f1f5f9;
+      background: rgba(255, 255, 255, 0.25);
     }
-
-    input[type="file"] {
-      display: none;
-    }
-
-    .btn {
-      background-color: var(--primary-color);
+    input[type="file"] { display: none; }
+    .ios-btn {
+      background: var(--primary-color);
       color: white;
-      padding: 10px 18px;
       border: none;
-      border-radius: 6px;
-      cursor: pointer;
+      padding: 12px 20px;
+      border-radius: 16px;
+      font-size: 0.9rem;
       font-weight: 600;
-      transition: background-color 0.2s;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0, 122, 255, 0.3);
     }
-
-    .btn:hover {
-      background-color: #1d4ed8;
-    }
-
-    .btn:disabled {
-      background-color: #94a3b8;
-      cursor: not-allowed;
-    }
-
-    .file-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-
+    .ios-btn:disabled { background: rgba(142, 142, 147, 0.4); box-shadow: none; }
+    .file-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
     .file-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 12px;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      margin-bottom: 8px;
-      background: #fff;
+      background: rgba(255, 255, 255, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      padding: 14px 18px;
+      border-radius: 18px;
     }
-
-    .file-name {
-      font-weight: 500;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      overflow: hidden;
-      margin-right: 12px;
-    }
-
+    .file-name { font-weight: 600; font-size: 0.9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .file-actions a {
       color: var(--primary-color);
       text-decoration: none;
       font-weight: 600;
-      font-size: 0.875rem;
+      font-size: 0.85rem;
       padding: 6px 12px;
-      background-color: #eff6ff;
-      border-radius: 4px;
-      white-space: nowrap;
+      background: rgba(0, 122, 255, 0.12);
+      border-radius: 12px;
     }
-
-    .file-actions a:hover {
-      background-color: #dbeafe;
-    }
-
-    #status {
-      margin-top: 12px;
-      font-size: 0.875rem;
-      font-weight: 500;
-      color: #334155;
-    }
+    #status { margin-top: 14px; font-size: 0.85rem; font-weight: 500; }
   </style>
 </head>
 <body>
-
   <div class="container">
-    <div class="card">
-      <h1>파일 업로드 (ZIP, PNG, JPG 모두 가능)</h1>
+    <div class="ios-card">
+      <h1>파일 업로드</h1>
       <div class="upload-box">
         <input type="file" id="fileInput">
-        <button class="btn" onclick="document.getElementById('fileInput').click()">파일 선택</button>
-        <p id="fileNameDisplay" style="color: #64748b;">선택된 파일 없음</p>
-        <button class="btn" id="uploadBtn" onclick="uploadFile()" disabled>업로드 시작</button>
+        <button class="ios-btn" onclick="document.getElementById('fileInput').click()">파일 선택</button>
+        <p id="fileNameDisplay" style="margin: 12px 0; font-size: 0.85rem; color: var(--text-sub);">선택된 파일 없음</p>
+        <button class="ios-btn" id="uploadBtn" onclick="uploadFile()" disabled>업로드 시작</button>
         <div id="status"></div>
       </div>
     </div>
 
-    <div class="card">
-      <h2>실시간 공유 파일 목록</h2>
+    <div class="ios-card">
+      <h2>공유 파일 목록</h2>
       <ul class="file-list" id="fileList">
         <li>목록을 불러오는 중...</li>
       </ul>
@@ -143,9 +100,8 @@
   </div>
 
   <script>
-    // 전달받은 값 적용 완료
-    const GITHUB_TOKEN = "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";
     const GIST_ID = "bee335b6e3ab61f3a0181bbd3303ca1a";
+    const FREEIMAGEHOST_API_KEY = "6d207e02198a847aa98d0a2a901485a5";
 
     const fileInput = document.getElementById('fileInput');
     const fileNameDisplay = document.getElementById('fileNameDisplay');
@@ -169,99 +125,56 @@
       if (!file) return;
 
       uploadBtn.disabled = true;
-      statusDiv.textContent = '파일 업로드 중...';
+      statusDiv.textContent = '✨ 업로드 중...';
 
       const formData = new FormData();
-      formData.append('reqtype', 'fileupload');
-      formData.append('fileToUpload', file);
+      formData.append('key', FREEIMAGEHOST_API_KEY);
+      formData.append('action', 'upload');
+      formData.append('source', file);
 
       try {
-        const uploadRes = await fetch('https://corsproxy.io/?https://catbox.moe/user/api.php', {
-          method: 'POST',
-          body: formData
-        });
+        const uploadRes = await fetch('https://freeimage.host/api/1/upload', { method: 'POST', body: formData });
+        const uploadData = await uploadRes.json();
+        const downloadURL = uploadData.image.url;
 
-        if (!uploadRes.ok) throw new Error('파일 서버 업로드 실패');
-        const downloadURL = (await uploadRes.text()).trim();
-
-        statusDiv.textContent = 'GitHub Gist 목록 동기화 중...';
+        statusDiv.textContent = '☁️ 동기화 중...';
 
         const currentFiles = await fetchGistFiles();
-        currentFiles.unshift({
-          name: file.name,
-          url: downloadURL,
-          date: new Date().toLocaleDateString()
-        });
+        currentFiles.unshift({ name: file.name, url: downloadURL });
 
         await updateGistFiles(currentFiles);
 
-        statusDiv.textContent = '✅ 업로드 및 모든 기기 동기화 완료!';
+        statusDiv.textContent = '✅ 완료!';
         fileInput.value = '';
         fileNameDisplay.textContent = '선택된 파일 없음';
-
         loadFileList();
       } catch (error) {
-        console.error("오류:", error);
         statusDiv.textContent = '❌ 실패: ' + error.message;
         uploadBtn.disabled = false;
       }
     }
 
     async function fetchGistFiles() {
-      const res = await fetch(`https://api.github.com/gists/${GIST_ID}`, {
-        headers: {
-          'Authorization': `token ${GITHUB_TOKEN}`,
-          'Accept': 'application/vnd.github.v3+json'
-        }
-      });
-      const data = await res.json();
-      
-      // Gist 내 파일 탐색 (filename이 다를 경우 대비해 첫번째 파일 파싱)
-      if (data.files) {
-        const firstFileKey = Object.keys(data.files)[0];
-        if (firstFileKey && data.files[firstFileKey].content) {
-          try {
-            return JSON.parse(data.files[firstFileKey].content);
-          } catch {
-            return [];
-          }
-        }
-      }
-      return [];
+      const res = await fetch(`/api/gist?gistId=${GIST_ID}`);
+      return await res.json();
     }
 
     async function updateGistFiles(filesArray) {
-      const res = await fetch(`https://api.github.com/gists/${GIST_ID}`, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `token ${GITHUB_TOKEN}`,
-          'Accept': 'application/vnd.github.v3+json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          files: {
-            'files.json': {
-              content: JSON.stringify(filesArray, null, 2)
-            }
-          }
-        })
+      await fetch(`/api/gist?gistId=${GIST_ID}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(filesArray)
       });
-
-      if (!res.ok) {
-        throw new Error('Gist 동기화 실패 (토큰 권한 확인 필요)');
-      }
     }
 
     async function loadFileList() {
-      fileListEl.innerHTML = '<li>동기화된 목록 불러오는 중...</li>';
+      fileListEl.innerHTML = '<li>동기화 중...</li>';
       try {
         const files = await fetchGistFiles();
-
-        if (files.length === 0) {
-          fileListEl.innerHTML = '<li style="text-align:center; color:#64748b;">저장된 파일이 없습니다.</li>';
+        if (!files.length) {
+          fileListEl.innerHTML = '<li style="text-align:center; color:var(--text-sub);">파일이 없습니다.</li>';
           return;
         }
-
         fileListEl.innerHTML = '';
         files.forEach(file => {
           const li = document.createElement('li');
@@ -269,14 +182,13 @@
           li.innerHTML = `
             <span class="file-name">${file.name}</span>
             <div class="file-actions">
-              <a href="${file.url}" target="_blank" rel="noopener noreferrer">열기 / 다운로드</a>
+              <a href="${file.url}" target="_blank" rel="noopener noreferrer">보기 / 다운로드</a>
             </div>
           `;
           fileListEl.appendChild(li);
         });
       } catch (error) {
-        console.error(error);
-        fileListEl.innerHTML = '<li>목록을 불러올 수 없습니다.</li>';
+        fileListEl.innerHTML = '<li>목록 불러오기 실패</li>';
       }
     }
 
